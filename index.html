@@ -456,6 +456,192 @@
       }
     }
     function copyBulletsText() { copyText(BULLETS_TEXT); }
+
+    /* ─────────────────────────────────────
+       v1.1: 트래킹 — 카카오 backend cross-origin POST
+       site=seo 마커로 admin 페이지에서 분리 조회 가능
+       (visit 알림 + 분석 이벤트 + 클릭 히트맵 + 체류 시간)
+       ───────────────────────────────────── */
+    (function tracker() {
+      var API_BASE = "https://kakaopay.joy-ull.info";
+      var SITE_MARKER = "[seo] ";
+
+      // ① VisitTracker — 1일 1회 텔레그램 알림용
+      try {
+        var LAST_KEY = "yull-seo-visit-last";
+        var last = window.localStorage.getItem(LAST_KEY);
+        var now = Date.now();
+        if (!last || now - parseInt(last, 10) >= 24 * 60 * 60 * 1000) {
+          window.localStorage.setItem(LAST_KEY, String(now));
+          fetch(API_BASE + "/api/visit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              path: SITE_MARKER + window.location.pathname + window.location.search,
+              referrer: document.referrer || "direct",
+              ua: navigator.userAgent,
+            }),
+            keepalive: true,
+          }).catch(function () {});
+        }
+      } catch (e) {}
+
+      // ② 분석 트래커 — 페이지뷰·클릭·스크롤·체류
+      var queue = [];
+      var flushTimer = null;
+      var visitorId, sessionId;
+      function uuid() {
+        if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+        return Date.now() + "-" + Math.random().toString(36).slice(2, 11);
+      }
+      function getOrCreate(key, storage) {
+        var v = storage.getItem(key);
+        if (!v) { v = uuid(); storage.setItem(key, v); }
+        return v;
+      }
+      try {
+        visitorId = getOrCreate("yull_visitor_id", localStorage);
+        sessionId = getOrCreate("yull_session_id", sessionStorage);
+      } catch (e) {
+        visitorId = uuid();
+        sessionId = uuid();
+      }
+
+      function flush() {
+        if (queue.length === 0) return;
+        var events = queue.splice(0, queue.length);
+        var body = JSON.stringify({
+          visitorId: visitorId,
+          sessionId: sessionId,
+          events: events,
+          ua: navigator.userAgent,
+          referrer: document.referrer || "direct",
+        });
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon(API_BASE + "/api/event", new Blob([body], { type: "application/json" }));
+        } else {
+          fetch(API_BASE + "/api/event", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: body,
+            keepalive: true,
+          }).catch(function () {});
+        }
+      }
+      function scheduleFlush() {
+        if (queue.length >= 10) {
+          if (flushTimer) { clearTimeout(flushTimer); flushTimer = null; }
+          flush();
+          return;
+        }
+        if (flushTimer) return;
+        flushTimer = setTimeout(function () { flushTimer = null; flush(); }, 300);
+      }
+      function track(ev) {
+        ev.ts = Date.now();
+        queue.push(ev);
+        scheduleFlush();
+      }
+      function buildSelector(el) {
+        if (!el) return "";
+        var parts = [], cur = el, depth = 0;
+        while (cur && depth < 3 && cur.tagName !== "BODY") {
+          var part = cur.tagName.toLowerCase();
+          if (cur.id) part += "#" + cur.id;
+          else if (cur.className && typeof cur.className === "string") {
+            var cls = cur.className.split(/\s+/).filter(function (c) { return c && c.length < 30; }).slice(0, 2);
+            if (cls.length) part += "." + cls.join(".");
+          }
+          parts.unshift(part);
+          cur = cur.parentElement;
+          depth++;
+        }
+        return parts.join(" > ");
+      }
+
+      var path = SITE_MARKER + window.location.pathname + window.location.search;
+
+      // pageview
+      track({
+        type: "pageview",
+        path: path,
+        vw: window.innerWidth,
+        vh: window.innerHeight,
+        meta: { lang: navigator.language },
+      });
+
+      // 체류 시간
+      var pageEnterTs = Date.now();
+      var lastVisibleTs = pageEnterTs;
+      var totalVisibleMs = 0;
+      function onVisibilityChange() {
+        var now = Date.now();
+        if (document.visibilityState === "hidden") {
+          totalVisibleMs += now - lastVisibleTs;
+        } else {
+          lastVisibleTs = now;
+        }
+      }
+      function flushDuration() {
+        var now = Date.now();
+        if (document.visibilityState === "visible") {
+          totalVisibleMs += now - lastVisibleTs;
+          lastVisibleTs = now;
+        }
+        track({
+          type: "duration",
+          path: path,
+          meta: { visible_ms: totalVisibleMs, total_ms: now - pageEnterTs },
+        });
+        flush();
+      }
+      document.addEventListener("visibilitychange", onVisibilityChange);
+      window.addEventListener("pagehide", flushDuration);
+      window.addEventListener("beforeunload", flushDuration);
+
+      // 클릭 (좌표 + selector + 텍스트)
+      document.addEventListener("click", function (e) {
+        var target = e.target;
+        if (!target) return;
+        var text = (target.textContent || "").trim().slice(0, 60);
+        track({
+          type: "click",
+          path: path,
+          x: Math.round(e.clientX),
+          y: Math.round(e.clientY),
+          vw: window.innerWidth,
+          vh: window.innerHeight,
+          target: buildSelector(target),
+          target_text: text || undefined,
+        });
+      }, { capture: true });
+
+      // 스크롤 깊이
+      var maxDepth = 0, scrollTimer = null;
+      window.addEventListener("scroll", function () {
+        var sh = document.documentElement.scrollHeight;
+        var st = window.scrollY + window.innerHeight;
+        var depth = sh > 0 ? Math.min(100, Math.round((st / sh) * 100)) : 0;
+        if (depth > maxDepth) {
+          maxDepth = depth;
+          if (scrollTimer) return;
+          scrollTimer = setTimeout(function () {
+            scrollTimer = null;
+            track({ type: "scroll_depth", path: path, meta: { depth: maxDepth } });
+          }, 1000);
+        }
+      }, { passive: true });
+    })();
+  </script>
+
+  <!-- Microsoft Clarity — 같은 프로젝트 ID + site=seo 태그 -->
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "wxddvk2f1g");
+    window.clarity && window.clarity('set', 'site', 'seo');
   </script>
 </body>
 </html>
