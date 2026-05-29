@@ -315,10 +315,97 @@
       .left-main .embed-box { height: 320px; }
       .btn-primary, .btn-secondary { font-size: 12px; }
     }
+
+    /* ─────────────────────────────────────
+       v1.2: 카카오톡 인앱브라우저 안내 (배너 + 모달)
+       카톡 안에서는 <a download>가 무시되어 새 탭만 열림 → 외부 브라우저로 유도
+       ───────────────────────────────────── */
+    .kakao-banner {
+      display: none;
+      background: linear-gradient(135deg, #FFF59D, #FFD54F);
+      color: #1B1B1B;
+      padding: 11px 14px;
+      border-radius: 11px;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.5;
+      border: 1px solid rgba(0,0,0,0.06);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .kakao-banner.show { display: block; animation: fadeUp 0.4s both; }
+    .kakao-banner .kb-strong {
+      background: rgba(0,0,0,0.10);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-weight: 900;
+    }
+    .kakao-banner .kb-row {
+      display: flex; gap: 6px; align-items: center;
+      flex-wrap: wrap; margin-top: 8px;
+    }
+    .kakao-banner .kb-btn {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: #1B1B1B; color: white;
+      padding: 6px 11px; border-radius: 7px;
+      font-size: 11.5px; font-weight: 800;
+      text-decoration: none; border: none; cursor: pointer;
+      white-space: nowrap;
+    }
+    .kakao-banner .kb-btn.kb-close { background: #6B7280; }
+
+    .kakao-modal-bg {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 200;
+      align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .kakao-modal-bg.show { display: flex; animation: fadeUp 0.25s both; }
+    .kakao-modal {
+      background: white; border-radius: 14px;
+      max-width: 360px; width: 100%;
+      padding: 22px 20px 18px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.32);
+    }
+    .kakao-modal h3 {
+      font-size: 15px; font-weight: 900;
+      margin: 0 0 6px; text-align: center;
+    }
+    .kakao-modal p {
+      font-size: 12.5px; color: #4B5563;
+      margin: 0 0 14px; line-height: 1.55; text-align: center;
+    }
+    .kakao-modal p strong { color: var(--toss-blue); font-weight: 900; }
+    .kakao-modal .km-step {
+      background: #F3F4F6; border-radius: 8px;
+      padding: 11px 13px; font-size: 12px;
+      margin-bottom: 12px; color: #1F2937; line-height: 1.7;
+    }
+    .kakao-modal .km-step b { color: var(--toss-blue); font-weight: 900; }
+    .kakao-modal .km-cta { display: flex; flex-direction: column; gap: 8px; }
+    .kakao-modal .km-btn {
+      width: 100%; padding: 11px; border-radius: 9px;
+      font-weight: 800; font-size: 13px;
+      border: none; cursor: pointer;
+    }
+    .kakao-modal .km-btn-primary { background: var(--toss-blue); color: white; }
+    .kakao-modal .km-btn-primary:active { background: var(--toss-blue-deep); }
+    .kakao-modal .km-btn-secondary { background: #F3F4F6; color: #374151; }
   </style>
 </head>
 <body>
   <div class="page">
+
+    <!-- v1.2: 카톡 인앱브라우저 자동 감지 배너 (그 외 브라우저에서는 숨김) -->
+    <div id="kakaoBanner" class="kakao-banner">
+      📱 <span class="kb-strong">카카오톡 안에서는 파일 다운로드가 안 됩니다.</span>
+      &nbsp;우상단 ⋮ (점 3개) → <b>다른 브라우저로 열기</b> 한 뒤 다시 시도해주세요.
+      <div class="kb-row">
+        <button class="kb-btn" onclick="copyText(location.href, '페이지 링크 복사 완료')">📋 페이지 링크 복사</button>
+        <button class="kb-btn kb-close" onclick="document.getElementById('kakaoBanner').classList.remove('show')">닫기</button>
+      </div>
+    </div>
 
     <!-- HEADER -->
     <header class="flex items-center justify-between flex-wrap gap-2 fade-up">
@@ -367,8 +454,8 @@
 
         <div class="mt-3 flex flex-wrap gap-1.5 justify-center">
           <button onclick="copyBulletsText()" class="btn-primary">📋 요약텍스트 복사</button>
-          <a href="./docs/yull-bullets.pdf" download="조율_업무강점_5개.pdf" class="btn-secondary">📄 PDF 다운</a>
-          <a href="./docs/yull-strengths.docx" download="조율_업무강점_5개.docx" class="btn-secondary">📎 DOCX 첨부</a>
+          <a href="./docs/yull-bullets.pdf" download="조율_업무강점_5개.pdf" onclick="dl(event, this)" class="btn-secondary">📄 PDF 다운</a>
+          <a href="./docs/yull-strengths.docx" download="조율_업무강점_5개.docx" onclick="dl(event, this)" class="btn-secondary">📎 DOCX 다운</a>
         </div>
       </article>
 
@@ -387,7 +474,7 @@
             <h3 class="action-title">경력기술서 확인하기</h3>
             <p class="action-desc">9년 BD·PM 이력 — 회사별 임팩트·성과·역할</p>
             <div class="action-cta">
-              <a href="./docs/yull-resume.pdf" download="조율_경력기술서.pdf" class="btn-primary">📄 PDF 다운</a>
+              <a href="./docs/yull-resume.pdf" download="조율_경력기술서.pdf" onclick="dl(event, this)" class="btn-primary">📄 PDF 다운</a>
               <a href="./docs/yull-resume.pdf" target="_blank" rel="noopener" class="btn-secondary">새 창 보기 ↗</a>
             </div>
           </div>
@@ -417,6 +504,24 @@
     <footer class="text-center text-[11px] text-gray-400 fade-up fade-up-d3">
       조율 · Yull Jo · 9년차 크립토 BD — 화폐 3.0의 동맹에 함께 서겠습니다.
     </footer>
+  </div>
+
+  <!-- v1.2: 카톡 다운로드 안내 모달 (다운로드 버튼 클릭 시 카톡 인앱에서만 등장) -->
+  <div id="kakaoModalBg" class="kakao-modal-bg" onclick="if(event.target===this) closeKakaoModal()">
+    <div class="kakao-modal">
+      <h3>📱 카카오톡 인앱브라우저</h3>
+      <p>이 파일은 <strong>카카오톡 안에서는 직접 다운로드가 안 됩니다.</strong><br>
+        아래 순서로 외부 브라우저에서 열어주세요.</p>
+      <div class="km-step">
+        <b>1.</b> 우상단 <b>⋮</b> (점 3개) 클릭<br>
+        <b>2.</b> <b>다른 브라우저로 열기</b> 선택<br>
+        <b>3.</b> 크롬·사파리에서 다시 다운로드 버튼 클릭
+      </div>
+      <div class="km-cta">
+        <button class="km-btn km-btn-primary" onclick="copyText(location.href, '페이지 링크 복사 완료'); closeKakaoModal()">📋 페이지 링크 복사</button>
+        <button class="km-btn km-btn-secondary" onclick="closeKakaoModal()">닫기</button>
+      </div>
+    </div>
   </div>
 
   <!-- 토스트 -->
@@ -464,10 +569,11 @@
 
 조 율 · 2026.05 · 토스증권 Business Development Manager (Crypto) 지원`;
 
-    async function copyText(text) {
+    async function copyText(text, msg) {
+      const m = msg || "복사되었습니다";
       try {
         await navigator.clipboard.writeText(text);
-        showToast("복사되었습니다");
+        showToast(m);
       } catch {
         const ta = document.createElement("textarea");
         ta.value = text;
@@ -475,10 +581,54 @@
         ta.select();
         document.execCommand("copy");
         document.body.removeChild(ta);
-        showToast("복사되었습니다");
+        showToast(m);
       }
     }
     function copyBulletsText() { copyText(BULLETS_TEXT); }
+
+    /* ─────────────────────────────────────
+       v1.2: 카카오톡 인앱브라우저 감지 + 외부 브라우저 유도
+       - 카톡 안에서는 <a download> 가 무시되어 새 탭만 열림 (iOS WKWebView · Android WebView 공통)
+       - 진입 시: 상단 안내 배너 자동 표시
+       - 다운로드 버튼 클릭 시:
+         · Android → Chrome 인텐트로 외부 호출 시도 + 폴백 모달
+         · iOS    → 안내 모달 (강제 호출 OS 차원 불가)
+       ───────────────────────────────────── */
+    var IS_KAKAO = /KAKAOTALK/i.test(navigator.userAgent);
+    var IS_ANDROID = /Android/i.test(navigator.userAgent);
+
+    function openKakaoModal()  { document.getElementById("kakaoModalBg").classList.add("show"); }
+    function closeKakaoModal() { document.getElementById("kakaoModalBg").classList.remove("show"); }
+
+    // 카톡 인앱 진입 시 상단 안내 배너 자동 노출
+    if (IS_KAKAO) {
+      window.addEventListener("DOMContentLoaded", function () {
+        var b = document.getElementById("kakaoBanner");
+        if (b) b.classList.add("show");
+      });
+    }
+
+    /**
+     * 다운로드 공용 핸들러
+     * 일반 브라우저: 기본 <a download> 동작 그대로 (event.preventDefault 안 함)
+     * 카톡 인앱: 외부 브라우저로 유도
+     */
+    function dl(e, anchor) {
+      if (!IS_KAKAO) return; // 정상 브라우저는 그대로 다운로드
+      e.preventDefault();
+      if (IS_ANDROID) {
+        try {
+          var abs = new URL(anchor.getAttribute("href"), location.href).href;
+          var intent = "intent://" + abs.replace(/^https?:\/\//, "") + "#Intent;scheme=https;package=com.android.chrome;end";
+          window.location.href = intent;
+        } catch (_) {}
+        // 인텐트가 막혔거나 Chrome이 없을 경우 대비 — 폴백 모달
+        setTimeout(openKakaoModal, 900);
+      } else {
+        // iOS: OS 차원에서 외부 강제 호출 불가 → 안내만
+        openKakaoModal();
+      }
+    }
 
     /* ─────────────────────────────────────
        v1.1: 트래킹 — 카카오 backend cross-origin POST
