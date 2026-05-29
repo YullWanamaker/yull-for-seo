@@ -632,25 +632,20 @@
     }
 
     /**
-     * 다운로드 공용 핸들러
-     * 일반 브라우저: 기본 <a download> 동작 그대로 (event.preventDefault 안 함)
-     * 카톡 인앱: 외부 브라우저로 유도
+     * 다운로드 공용 핸들러 (v1.6)
+     * 회장님 지시 — "다운되더라도 안 되더라도 시도는 해줘야지"
+     *
+     * 일반 브라우저: 기본 <a download> 동작 그대로 (preventDefault 없음)
+     * 카톡 인앱:
+     *   - 기본 동작도 그대로 시도 (다운로드 / 새 탭 열기 등 OS·앱이 할 수 있는 모든 것)
+     *   - 동시에 안내 모달 노출 → 안 되면 외부 브라우저로 옮기도록 유도
+     *   - 인텐트 호출 제거 — 인텐트가 페이지 이동을 일으켜 기본 다운로드 시도를 막아버림
      */
     function dl(e, anchor) {
-      if (!IS_KAKAO) return; // 정상 브라우저는 그대로 다운로드
-      e.preventDefault();
-      if (IS_ANDROID) {
-        try {
-          var abs = new URL(anchor.getAttribute("href"), location.href).href;
-          var intent = "intent://" + abs.replace(/^https?:\/\//, "") + "#Intent;scheme=https;package=com.android.chrome;end";
-          window.location.href = intent;
-        } catch (_) {}
-        // 인텐트가 막혔거나 Chrome이 없을 경우 대비 — 폴백 모달
-        setTimeout(openKakaoModal, 900);
-      } else {
-        // iOS: OS 차원에서 외부 강제 호출 불가 → 안내만
-        openKakaoModal();
-      }
+      if (!IS_KAKAO) return; // 정상 브라우저는 기본 동작 그대로
+      // preventDefault 안 함 — <a download> 가 OS·앱이 허용하는 만큼 시도
+      // 모달은 살짝 늦게 → 브라우저가 다운로드/새 탭 트리거를 먼저 발사하도록
+      setTimeout(openKakaoModal, 350);
     }
 
     /* ─────────────────────────────────────
