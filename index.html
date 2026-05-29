@@ -166,6 +166,23 @@
     }
     .embed-box iframe { width: 100%; height: 100%; border: 0; display: block; }
 
+    /* v1.5: 모바일 PDF 폴백 — 안드로이드 Chrome·iOS Safari가 iframe 안에서 PDF 렌더링을
+       지원하지 않아 빈 화면이 됨. 모바일에서는 1페이지 미리보기 JPG + PDF 새 창 버튼으로 대체. */
+    .mobile-pdf-fallback { display: none; }
+    .mobile-pdf-img {
+      width: 100%; height: auto;
+      display: block;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    .mobile-pdf-cta {
+      width: 100%;
+      justify-content: center;
+      text-align: center;
+      margin-top: 10px;
+    }
+
     /* highlight underline */
     .highlight-line {
       position: relative;
@@ -301,7 +318,13 @@
         min-height: auto;
       }
       .main-row { grid-template-columns: 1fr; gap: 12px; flex: none; }
-      .left-main .embed-box { min-height: 360px; height: 400px; flex: none; }
+      /* 모바일: PDF iframe 숨김 → 이미지 미리보기로 폴백 */
+      .left-main .embed-box { display: none; }
+      .left-main .mobile-pdf-fallback {
+        display: flex;
+        flex-direction: column;
+        margin-top: 12px;
+      }
       .action-card-body { padding: 24px 16px; }
       .action-icon { font-size: 38px; }
       .card { padding: 14px !important; }
@@ -442,6 +465,19 @@
             loading="lazy"
             title="조율 업무 강점 5개"
           ></iframe>
+        </div>
+
+        <!-- v1.5: 모바일 폴백 — 안드로이드·iOS Safari는 iframe PDF 렌더링 X → 이미지 미리보기 -->
+        <div class="mobile-pdf-fallback">
+          <a href="./docs/yull-bullets.pdf" target="_blank" rel="noopener" aria-label="업무 강점 5개 PDF 새 창 열기">
+            <img src="./docs/yull-bullets-preview.jpg"
+                 alt="업무 강점 5개 — PDF 1페이지 미리보기"
+                 loading="lazy"
+                 class="mobile-pdf-img" />
+          </a>
+          <a href="./docs/yull-bullets.pdf"
+             target="_blank" rel="noopener"
+             class="btn-secondary mobile-pdf-cta">🔍 원본 PDF 새 창에서 보기 ↗</a>
         </div>
 
         <div class="mt-3 flex flex-wrap gap-1.5 justify-center">
