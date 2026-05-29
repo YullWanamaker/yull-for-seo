@@ -2,20 +2,21 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>조율 · Yull — 서창훈 상무님께</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>조율 · Yull — 추천 요청</title>
   <meta name="description" content="화폐 3.0의 동맹에 함께 설 사람 — 조율(Yull)의 토스증권 BD 합류, 추천을 부탁드립니다." />
   <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#0064FF" />
 
   <!-- OG -->
-  <meta property="og:title" content="조율 · Yull — 서창훈 상무님께" />
+  <meta property="og:title" content="조율 · Yull — 추천 요청" />
   <meta property="og:description" content="화폐 3.0의 동맹에 함께 설 사람 — 추천을 부탁드립니다." />
   <meta property="og:type" content="website" />
 
   <!-- Tailwind via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Gmarket Sans (Toss-like rounded font) -->
+  <!-- Noto Sans KR -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
@@ -32,41 +33,51 @@
       --text-secondary: #6B7280;
       --text-muted: #9CA3AF;
     }
-    html { scroll-behavior: smooth; }
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
     body {
       font-family: "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", system-ui, sans-serif;
       background: var(--bg);
       color: var(--text-primary);
       -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
     }
     .accent { color: var(--toss-blue); }
     .accent-bg { background: var(--toss-blue); }
 
-    /* 토스 블루 라이트 칩 */
+    /* 칩 */
     .chip {
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      padding: 2px 10px;
+      padding: 2px 9px;
       border-radius: 999px;
       background: rgba(0, 100, 255, 0.08);
       color: var(--toss-blue);
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 700;
       letter-spacing: 0.04em;
+      white-space: nowrap;
     }
 
     /* 카드 */
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 16px;
+      border-radius: 14px;
       transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
     .card:hover {
       border-color: rgba(0, 100, 255, 0.4);
-      box-shadow: 0 4px 20px rgba(0, 100, 255, 0.08);
-      transform: translateY(-2px);
+      box-shadow: 0 4px 18px rgba(0, 100, 255, 0.08);
     }
 
     /* 버튼 */
@@ -74,52 +85,56 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      padding: 10px 18px;
-      border-radius: 10px;
+      gap: 4px;
+      padding: 8px 12px;
+      border-radius: 8px;
       background: var(--toss-blue);
       color: white;
       font-weight: 700;
-      font-size: 14px;
+      font-size: 12px;
       transition: all 0.15s ease;
       text-decoration: none;
+      white-space: nowrap;
+      min-height: 36px;
     }
-    .btn-primary:hover { background: var(--toss-blue-deep); transform: translateY(-1px); }
+    .btn-primary:hover { background: var(--toss-blue-deep); }
+    .btn-primary:active { transform: scale(0.97); }
 
     .btn-secondary {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      padding: 9px 14px;
-      border-radius: 10px;
-      background: rgba(0, 100, 255, 0.08);
+      gap: 4px;
+      padding: 7px 10px;
+      border-radius: 8px;
+      background: rgba(0, 100, 255, 0.07);
       color: var(--toss-blue);
       font-weight: 600;
-      font-size: 13px;
+      font-size: 11.5px;
       transition: all 0.15s ease;
       text-decoration: none;
-      border: 1px solid rgba(0, 100, 255, 0.18);
+      border: 1px solid rgba(0, 100, 255, 0.15);
+      cursor: pointer;
+      white-space: nowrap;
+      min-height: 34px;
     }
     .btn-secondary:hover { background: rgba(0, 100, 255, 0.14); }
+    .btn-secondary:active { transform: scale(0.97); }
 
-    /* PDF 임베드 박스 */
-    .pdf-embed {
+    /* 미리보기 박스 */
+    .preview {
       position: relative;
       width: 100%;
-      aspect-ratio: 8.5 / 11;
+      flex: 1;
+      min-height: 0;
       background: #F3F4F6;
-      border-radius: 12px;
+      border-radius: 10px;
       overflow: hidden;
       border: 1px solid var(--border);
     }
-    .pdf-embed iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-    }
+    .preview iframe { width: 100%; height: 100%; border: 0; }
 
-    /* 강조 라인 */
+    /* highlight underline */
     .highlight-line {
       position: relative;
       display: inline-block;
@@ -127,265 +142,236 @@
     .highlight-line::after {
       content: "";
       position: absolute;
-      bottom: 2px; left: 0; right: 0;
-      height: 8px;
+      bottom: 0; left: 0; right: 0;
+      height: 7px;
       background: rgba(0, 100, 255, 0.18);
       z-index: -1;
     }
 
-    /* 토스트 (복사 완료) */
+    /* 토스트 */
     .toast {
       position: fixed;
-      bottom: 24px;
+      bottom: 20px;
       left: 50%;
       transform: translateX(-50%) translateY(20px);
       background: var(--toss-gray);
       color: white;
-      padding: 12px 20px;
-      border-radius: 10px;
-      font-size: 13px;
+      padding: 11px 18px;
+      border-radius: 9px;
+      font-size: 12.5px;
       font-weight: 600;
       opacity: 0;
       pointer-events: none;
       transition: all 0.25s ease;
       z-index: 100;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.18);
     }
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     /* fade-in */
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(12px); }
+      from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .fade-up { animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
-    .fade-up-d1 { animation-delay: 0.1s; }
-    .fade-up-d2 { animation-delay: 0.2s; }
-    .fade-up-d3 { animation-delay: 0.35s; }
-    .fade-up-d4 { animation-delay: 0.5s; }
+    .fade-up { animation: fadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
+    .fade-up-d1 { animation-delay: 0.05s; }
+    .fade-up-d2 { animation-delay: 0.12s; }
+    .fade-up-d3 { animation-delay: 0.2s; }
+
+    /* ─────────────────────────────────────
+       데스크탑: 한 화면 가로 3열
+       ───────────────────────────────────── */
+    .page {
+      min-height: 100vh;
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      padding: 18px 24px 16px;
+      gap: 14px;
+    }
+    .cards-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .contact-line { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12px; }
+    .contact-line a { color: #374151; transition: color 0.15s; }
+    .contact-line a:hover { color: var(--toss-blue); }
+    .contact-sep { color: #D1D5DB; }
+
+    .pdf-fallback {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+      padding: 24px 16px;
+      gap: 8px;
+    }
+
+    /* ─────────────────────────────────────
+       모바일 최적화 (≤ 768px)
+       ───────────────────────────────────── */
+    @media (max-width: 768px) {
+      .page {
+        padding: 14px 14px 18px;
+        gap: 12px;
+        min-height: auto;
+      }
+      .cards-row { grid-template-columns: 1fr; gap: 12px; }
+      .card { padding: 14px !important; }
+
+      /* 모바일 헤더 — 두 줄, 간단 */
+      header h-row {}
+
+      /* 모바일에서 미리보기 높이 고정 — 너무 길어지지 않게 */
+      .preview { min-height: 280px; max-height: 320px; }
+
+      /* 모바일에서 hero 줄간격 좁힘 */
+      h1 { line-height: 1.3; }
+
+      /* 버튼들 모바일에서 작게 */
+      .btn-primary { font-size: 12.5px; padding: 9px 13px; }
+      .btn-secondary { font-size: 11.5px; padding: 8px 11px; }
+
+      /* 카드 간 spacing */
+      .cards-row > * { animation-delay: 0s !important; }
+    }
+
+    /* 매우 작은 화면 (iPhone SE 등) */
+    @media (max-width: 380px) {
+      .page { padding: 12px 12px 16px; }
+      .preview { min-height: 240px; max-height: 280px; }
+      .btn-primary, .btn-secondary { font-size: 11.5px; }
+    }
   </style>
 </head>
 <body>
-  <!-- ─────────────────────────────────────
-       HEADER
-       ───────────────────────────────────── -->
-  <header class="border-b border-gray-100 bg-white/80 backdrop-blur sticky top-0 z-10">
-    <div class="mx-auto max-w-4xl px-6 py-3.5 flex items-center justify-between">
+  <div class="page">
+
+    <!-- ─────────────────────────────────────
+         HEADER (컴팩트, 상무님 칩 제거)
+         ───────────────────────────────────── -->
+    <header class="flex items-center justify-between flex-wrap gap-2 fade-up">
       <div class="flex items-center gap-2.5">
         <div class="w-7 h-7 rounded-md accent-bg flex items-center justify-center text-white font-extrabold text-[13px]">Y</div>
-        <span class="font-extrabold text-[15px]">조율 · Yull</span>
+        <span class="font-extrabold text-[14px]">조율 · Yull</span>
       </div>
-      <span class="chip">For. 서창훈 상무님</span>
-    </div>
-  </header>
-
-  <!-- ─────────────────────────────────────
-       HERO
-       ───────────────────────────────────── -->
-  <section class="mx-auto max-w-4xl px-6 pt-16 sm:pt-24 pb-14">
-    <p class="chip fade-up">RECOMMENDATION REQUEST</p>
-    <h1 class="mt-5 text-[clamp(1.8rem,4.5vw,3rem)] font-black leading-tight tracking-tight fade-up fade-up-d1">
-      화폐 <span class="accent">3.0</span>의 다음 시대,<br />
-      그 <span class="highlight-line">동맹</span>에 함께 설 사람을<br />
-      추천드립니다.
-    </h1>
-    <p class="mt-7 text-[15px] sm:text-[16px] leading-relaxed text-gray-700 max-w-2xl fade-up fade-up-d2">
-      안녕하세요, 서창훈 상무님.<br />
-      이번 토스증권 BD Manager(Crypto) 포지션에 지원한
-      <strong class="accent">조율(Yull)</strong>입니다.<br /><br />
-
-      <span class="text-gray-600">
-        상무님께서 BCMC에서 말씀하신
-        <strong>"프로그래머블 머니 · 스테이블코인 · 보더리스 금융 슈퍼앱"</strong>의
-        다음 시대를 준비해온
-        <strong class="accent">9년차 크립토 BD</strong>로서,
-        그 동맹에 합류하고자 추천을 부탁드립니다.
-      </span>
-    </p>
-
-    <!-- 30초 핵심 -->
-    <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3 fade-up fade-up-d3">
-      <div class="card p-5">
-        <p class="text-[11px] font-bold uppercase tracking-widest text-gray-500">END-TO-END BD</p>
-        <p class="mt-2 text-[15px] font-extrabold leading-snug">Kaito 캠페인 <span class="accent">$700K</span><br />PO 명의 직접 계약</p>
+      <div class="contact-line">
+        <a href="mailto:dla4038@naver.com">📧 dla4038@naver.com</a>
+        <span class="contact-sep">·</span>
+        <a href="tel:+821040385812">📞 010-4038-5812</a>
+        <span class="contact-sep">·</span>
+        <a href="https://x.com/Wanamaker_X" target="_blank" rel="noopener">𝕏 @Wanamaker_X</a>
       </div>
-      <div class="card p-5">
-        <p class="text-[11px] font-bold uppercase tracking-widest text-gray-500">전통금융 협력</p>
-        <p class="mt-2 text-[15px] font-extrabold leading-snug">SK증권·IBK·골드만삭스<br /><span class="accent">직접 BD</span></p>
-      </div>
-      <div class="card p-5">
-        <p class="text-[11px] font-bold uppercase tracking-widest text-gray-500">규제·표준</p>
-        <p class="mt-2 text-[15px] font-extrabold leading-snug">NEW-EIP <span class="accent">2저자</span><br />MiCA·CFTC·MAS 분석</p>
-      </div>
-    </div>
-  </section>
+    </header>
 
-  <!-- ─────────────────────────────────────
-       3개 자료 카드
-       ───────────────────────────────────── -->
-  <section class="mx-auto max-w-4xl px-6 py-10 space-y-10">
+    <!-- ─────────────────────────────────────
+         HERO (1–2줄)
+         ───────────────────────────────────── -->
+    <section class="fade-up fade-up-d1 mt-1">
+      <h1 class="text-[clamp(1.05rem,2.2vw,1.65rem)] font-black tracking-tight">
+        화폐 <span class="accent">3.0</span>의 다음 시대,
+        그 <span class="highlight-line">동맹</span>에 함께 설 사람을 추천드립니다.
+      </h1>
+      <p class="mt-1.5 text-[12px] sm:text-[13px] text-gray-600 leading-snug">
+        9년차 크립토 BD · <strong>Kaito $700K</strong> End-to-end · <strong>골드만삭스(홍콩) RWA</strong> · <strong>SK증권·IBK Weekly</strong> · <strong>NEW-EIP 2저자</strong>
+      </p>
+    </section>
 
-    <!-- ① 포트폴리오 -->
-    <article class="card p-7 sm:p-9 fade-up">
-      <div class="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <p class="chip">01 · PORTFOLIO</p>
-          <h2 class="mt-3 text-[22px] sm:text-[26px] font-black tracking-tight">
-            포트폴리오 사이트
-          </h2>
-          <p class="mt-2 text-[14px] text-gray-600 leading-relaxed">
-            9년 경력 · Career · 토스 JD 11개 항목 매칭 · 9년의 접점 (골드만삭스 · SK증권 · IBK · 글로벌 파트너).<br />
-            <span class="text-gray-500">예상 소요: 3–7분 (인트로 스킵 가능)</span>
-          </p>
+    <!-- ─────────────────────────────────────
+         3개 자료 카드 — 순서: 불렛 → 경력기술서 → 포트폴리오
+         ───────────────────────────────────── -->
+    <main class="cards-row">
+
+      <!-- ① 불렛 포인트 -->
+      <article class="card fade-up fade-up-d2 p-4">
+        <div class="flex items-center justify-between gap-2 mb-2">
+          <p class="chip">01 · BULLETS</p>
+          <span class="text-[10.5px] font-bold text-gray-400">준비 중</span>
         </div>
-        <a href="https://toss.joy-ull.info" target="_blank" rel="noopener" class="btn-primary shrink-0">
-          포트폴리오 방문
-          <span>→</span>
-        </a>
-      </div>
+        <h2 class="text-[16px] font-black tracking-tight">불렛 포인트</h2>
+        <p class="mt-1 text-[11.5px] text-gray-500 leading-snug">1분 안에 파악 가능한 핵심 수치·성과</p>
 
-      <!-- 미리보기 (iframe 임베드) -->
-      <div class="mt-7 rounded-xl overflow-hidden border border-gray-200" style="aspect-ratio: 16 / 9; background: #F3F4F6;">
-        <iframe
-          src="https://toss.joy-ull.info"
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"
-          class="w-full h-full"
-          style="border: 0;"
-          title="조율 포트폴리오 미리보기"
-        ></iframe>
-      </div>
-    </article>
+        <div class="preview mt-3 pdf-fallback">
+          <p class="text-[13px] font-bold text-gray-500">📎 자료 준비 중</p>
+          <p class="text-[11px] text-gray-400">파일 받는 즉시 임베드 활성화</p>
+        </div>
 
-    <!-- ② 경력기술서 -->
-    <article class="card p-7 sm:p-9 fade-up">
-      <div class="flex items-start justify-between gap-4 flex-wrap">
-        <div>
+        <div class="mt-3 flex flex-wrap gap-1.5">
+          <a href="./docs/yull-bullets.pdf" download="조율_불렛포인트.pdf" class="btn-primary" id="bullets-pdf-link">📄 PDF 다운</a>
+          <a id="bullets-gdocs" href="#" target="_blank" rel="noopener" class="btn-secondary">📝 Google Docs</a>
+          <button onclick="copyBulletsText()" class="btn-secondary">📋 텍스트 복사</button>
+        </div>
+      </article>
+
+      <!-- ② 경력기술서 -->
+      <article class="card fade-up fade-up-d2 p-4">
+        <div class="flex items-center justify-between gap-2 mb-2">
           <p class="chip">02 · 경력기술서</p>
-          <h2 class="mt-3 text-[22px] sm:text-[26px] font-black tracking-tight">
-            경력기술서
-          </h2>
-          <p class="mt-2 text-[14px] text-gray-600 leading-relaxed">
-            9년 BD·PM 이력 — 회사별 임팩트·성과·역할 상세 기술.<br />
-            <span class="text-gray-500">바로 보기, PDF·Google Docs 다운로드, 텍스트 복사 — 편한 방식으로.</span>
-          </p>
+          <a href="./docs/yull-resume.pdf" target="_blank" rel="noopener" class="text-[11px] font-bold accent hover:underline">새 창 열기 →</a>
         </div>
-      </div>
+        <h2 class="text-[16px] font-black tracking-tight">경력기술서</h2>
+        <p class="mt-1 text-[11.5px] text-gray-500 leading-snug">9년 BD·PM 이력 — 회사별 임팩트·성과·역할</p>
 
-      <!-- PDF 임베드 -->
-      <div class="mt-7 pdf-embed">
-        <iframe
-          src="./docs/yull-resume.pdf#toolbar=0&navpanes=0"
-          loading="lazy"
-          title="조율 경력기술서"
-        ></iframe>
-      </div>
-
-      <!-- 액션 버튼 -->
-      <div class="mt-5 flex flex-wrap gap-2.5">
-        <a href="./docs/yull-resume.pdf" download="조율_경력기술서.pdf" class="btn-primary">
-          <span>📄</span> PDF 다운로드
-        </a>
-        <a id="resume-gdocs" href="#" target="_blank" rel="noopener" class="btn-secondary">
-          <span>📝</span> Google Docs 열기
-        </a>
-        <button onclick="copyResumeText()" class="btn-secondary">
-          <span>📋</span> 텍스트 전체 복사
-        </button>
-      </div>
-    </article>
-
-    <!-- ③ 핵심 요약 (블렛포인트) -->
-    <article class="card p-7 sm:p-9 fade-up">
-      <div class="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <p class="chip">03 · 핵심 요약</p>
-          <h2 class="mt-3 text-[22px] sm:text-[26px] font-black tracking-tight">
-            한 장 핵심 요약 <span class="text-gray-400 text-[18px] font-bold">· 불릿포인트</span>
-          </h2>
-          <p class="mt-2 text-[14px] text-gray-600 leading-relaxed">
-            추천서 작성 시 바로 인용 가능한 핵심 수치·성과 정리.<br />
-            <span class="text-gray-500">1분 안에 파악할 수 있도록 압축.</span>
-          </p>
+        <div class="preview mt-3">
+          <iframe
+            src="./docs/yull-resume.pdf#toolbar=0&navpanes=0"
+            loading="lazy"
+            title="조율 경력기술서"
+          ></iframe>
         </div>
-      </div>
 
-      <!-- PDF 임베드 (placeholder) -->
-      <div class="mt-7 pdf-embed flex items-center justify-center" id="bullets-embed-empty">
-        <div class="text-center p-6">
-          <p class="text-[14px] font-bold text-gray-500">📎 핵심 요약 자료 준비 중</p>
-          <p class="mt-2 text-[12px] text-gray-400">회장님이 파일 전달 후 임베드 예정</p>
+        <div class="mt-3 flex flex-wrap gap-1.5">
+          <a href="./docs/yull-resume.pdf" download="조율_경력기술서.pdf" class="btn-primary">📄 PDF 다운</a>
+          <a id="resume-gdocs" href="#" target="_blank" rel="noopener" class="btn-secondary">📝 Google Docs</a>
+          <button onclick="copyResumeText()" class="btn-secondary">📋 텍스트 복사</button>
         </div>
-      </div>
-      <!-- 파일 들어오면 위 div 제거하고 아래로 교체:
-      <div class="mt-7 pdf-embed">
-        <iframe src="./docs/yull-bullets.pdf#toolbar=0&navpanes=0" loading="lazy"></iframe>
-      </div>
-      -->
+      </article>
 
-      <!-- 액션 버튼 -->
-      <div class="mt-5 flex flex-wrap gap-2.5">
-        <a href="./docs/yull-bullets.pdf" download="조율_핵심요약.pdf" class="btn-primary" id="bullets-pdf-link">
-          <span>📄</span> PDF 다운로드
-        </a>
-        <a id="bullets-gdocs" href="#" target="_blank" rel="noopener" class="btn-secondary">
-          <span>📝</span> Google Docs 열기
-        </a>
-        <button onclick="copyBulletsText()" class="btn-secondary">
-          <span>📋</span> 텍스트 전체 복사
-        </button>
-      </div>
-    </article>
-  </section>
+      <!-- ③ 포트폴리오 -->
+      <article class="card fade-up fade-up-d3 p-4">
+        <div class="flex items-center justify-between gap-2 mb-2">
+          <p class="chip">03 · PORTFOLIO</p>
+          <a href="https://toss.joy-ull.info" target="_blank" rel="noopener" class="text-[11px] font-bold accent hover:underline">새 창 열기 →</a>
+        </div>
+        <h2 class="text-[16px] font-black tracking-tight">포트폴리오</h2>
+        <p class="mt-1 text-[11.5px] text-gray-500 leading-snug">JD 11개 항목 매칭 · 9년의 접점 · 토스 BD 톤</p>
 
-  <!-- ─────────────────────────────────────
-       FOOTER · CONTACT
-       ───────────────────────────────────── -->
-  <section class="mx-auto max-w-4xl px-6 pt-12 pb-20 fade-up">
-    <div class="card p-8 sm:p-10 text-center" style="background: linear-gradient(135deg, rgba(0,100,255,0.04), rgba(0,100,255,0.01));">
-      <p class="chip mx-auto">CONTACT</p>
-      <h3 class="mt-4 text-[22px] sm:text-[26px] font-black tracking-tight">
-        궁금하신 점 · 추가 자료 요청은 언제든.
-      </h3>
-      <p class="mt-2 text-[14px] text-gray-600">
-        가장 빠른 답은 텔레그램 · 그 외 채널도 항상 열려 있습니다.
-      </p>
+        <div class="preview mt-3">
+          <iframe
+            src="https://toss.joy-ull.info"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="조율 포트폴리오 미리보기"
+          ></iframe>
+        </div>
 
-      <div class="mt-7 flex flex-wrap items-center justify-center gap-3">
-        <a href="mailto:dla4038@naver.com" class="btn-primary">
-          <span>📧</span> dla4038@naver.com
-        </a>
-        <a href="tel:+821040385812" class="btn-secondary">
-          <span>📞</span> 010-4038-5812
-        </a>
-        <a href="https://x.com/Wanamaker_X" target="_blank" rel="noopener" class="btn-secondary">
-          <span>𝕏</span> @Wanamaker_X
-        </a>
-      </div>
+        <div class="mt-3 flex flex-wrap gap-1.5">
+          <a href="https://toss.joy-ull.info" target="_blank" rel="noopener" class="btn-primary">방문하기 →</a>
+          <button onclick="copyText('https://toss.joy-ull.info')" class="btn-secondary">📋 링크 복사</button>
+        </div>
+      </article>
+    </main>
 
-      <p class="mt-10 text-[12px] text-gray-400">
-        조율 · Yull Jo · 9년차 크립토 BD<br />
-        화폐 3.0의 동맹에 함께 서겠습니다.
-      </p>
-    </div>
-  </section>
+    <!-- 푸터 -->
+    <footer class="text-center text-[11px] text-gray-400 fade-up fade-up-d3">
+      조율 · Yull Jo · 9년차 크립토 BD — 화폐 3.0의 동맹에 함께 서겠습니다.
+    </footer>
+  </div>
 
   <!-- 토스트 -->
   <div id="toast" class="toast">복사되었습니다</div>
 
   <script>
-    // ─────────────────────────────────────
-    // 회장님 추후 교체할 링크 (Google Docs)
-    // ─────────────────────────────────────
-    const GDOCS_RESUME = ""; // 예: "https://docs.google.com/document/d/..."
+    // 회장님 추후 교체 (Google Docs 링크)
+    const GDOCS_RESUME = "";
     const GDOCS_BULLETS = "";
 
-    // ─────────────────────────────────────
-    // Google Docs 버튼 활성화 / 비활성화
-    // ─────────────────────────────────────
     (function setupGdocs() {
       const setup = (id, url) => {
         const a = document.getElementById(id);
@@ -402,9 +388,6 @@
       setup("bullets-gdocs", GDOCS_BULLETS);
     })();
 
-    // ─────────────────────────────────────
-    // 토스트
-    // ─────────────────────────────────────
     function showToast(msg) {
       const t = document.getElementById("toast");
       t.textContent = msg;
@@ -413,9 +396,6 @@
       window.__toastT = setTimeout(() => t.classList.remove("show"), 1800);
     }
 
-    // ─────────────────────────────────────
-    // 텍스트 복사 (회장님이 텍스트 콘텐츠 채워주실 곳)
-    // ─────────────────────────────────────
     const RESUME_TEXT = `[조율 · Yull · 경력기술서 텍스트]
 
 (회장님이 여기에 경력기술서 전문 텍스트를 넣어주시면
@@ -427,7 +407,7 @@
 
 (이하 본문 …)`;
 
-    const BULLETS_TEXT = `[조율 · Yull · 핵심 요약 불릿포인트]
+    const BULLETS_TEXT = `[조율 · Yull · 불렛 포인트]
 
 (회장님 자료 받으면 이곳에 텍스트 넣어 작동.)
 
@@ -444,7 +424,6 @@
         await navigator.clipboard.writeText(text);
         showToast("복사되었습니다");
       } catch {
-        // fallback
         const ta = document.createElement("textarea");
         ta.value = text;
         document.body.appendChild(ta);
